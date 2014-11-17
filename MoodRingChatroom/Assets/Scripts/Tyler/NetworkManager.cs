@@ -1,4 +1,4 @@
-//This code was written following Code Compile's "Unity3D Series - Networking Part 1" tutorial on Youtube
+﻿//This code was written following Code Compile's "Unity3D Series - Networking Part 1" tutorial on Youtube
 // https://www.youtube.com/watch?v=GEnkgqSH51E
 
 using UnityEngine;
@@ -13,7 +13,7 @@ public class NetworkManager : MonoBehaviour {
 
 	private void StartServer() {
 
-		Network.InitializeServer (16, 25002, false);
+		Network.InitializeServer (16, 25003, false);
 		MasterServer.RegisterHost (registeredGameName, "ProcJam MoodRing Chat", "Chat with mood detection");
 
 	}
