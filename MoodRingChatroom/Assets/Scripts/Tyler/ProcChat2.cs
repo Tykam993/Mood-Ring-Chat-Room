@@ -23,7 +23,7 @@ public class ProcChat2 : MonoBehaviour {
 
 	private void OnGUI() {
 
-		if (!NetworkMenu.Connected) {
+		if (!Network.isClient) {
 			return;
 		}
 
