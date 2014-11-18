@@ -13,7 +13,7 @@ public class NetworkManager : MonoBehaviour {
 
 	private void StartServer() {
 
-		Network.InitializeServer (16, 25003, false);
+		Network.InitializeServer (16, 25002, false);
 		MasterServer.RegisterHost (registeredGameName, "ProcJam MoodRing Chat", "Chat with mood detection");
 
 	}
