@@ -1,7 +1,11 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Emotions : MonoBehaviour {
+
+    public const string ACTIVE = "Active", DEACTIVE = "Deactive", PLEASANT = "Pleasant", UNPLEASANT = "Unpleasant",
+        EXCITED = "Active Pleasant", CONTENT = "Deactive Pleasant", BORED = "Deactive Unpleasant", PANIC = "Active Unpleasant";
 
 
 	//Create a list of active words
@@ -85,14 +89,45 @@ public class Emotions : MonoBehaviour {
 	//Create a dictionary
 	public static Dictionary<string, List<string>> emotion_dictionary = new Dictionary<string, List<string>>()
 	{
-		{ "Active", active},
-		{ "Deactive", deactive},
-		{ "Pleasant",pleasant},
-		{ "Unpleasant", unpleasant},
-		{ "Active Pleasant", active_pleasant},
-		{ "Active Unpleasant", active_unpleasant},
-		{ "Deactive Pleasant", deactive_unpleasant},
-		{ "Deactive Unpleasant", deactive_unpleasant}
+		{ ACTIVE, active},
+		{ DEACTIVE, deactive},
+		{ PLEASANT,pleasant},
+		{ UNPLEASANT, unpleasant},
+		{ EXCITED, active_pleasant},
+		{ PANIC, active_unpleasant},
+		{ BORED, deactive_unpleasant},
+		{ CONTENT, deactive_pleasant}
 	};
+
+    public static EmotionModel.EmotionIdeal GetEmotionIdealAssociated(string word)
+    {
+        foreach (KeyValuePair<string, List<string>> entry in emotion_dictionary)
+        {
+            //if we find that word == any word in the given list
+            if (entry.Value.Any(syn => word == syn))
+            {
+                switch (entry.Key)
+                {
+                    case ACTIVE:
+                        return EmotionModel.EmotionIdeal.Active;
+                    case DEACTIVE:
+                        return EmotionModel.EmotionIdeal.Deactive;
+                    case PLEASANT:
+                        return EmotionModel.EmotionIdeal.Pleasant;
+                    case UNPLEASANT:
+                        return EmotionModel.EmotionIdeal.Unpleasant;
+                    case EXCITED:
+                        return EmotionModel.EmotionIdeal.Excited;
+                    case PANIC:
+                        return EmotionModel.EmotionIdeal.Panic;
+                    case CONTENT:
+                        return EmotionModel.EmotionIdeal.Content;
+                }
+            }
+        }
+
+        //if we reach this point, then we haven't found any matches
+        return EmotionModel.EmotionIdeal.None;
+    }
 
 }

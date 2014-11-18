@@ -42,7 +42,8 @@ using System.Collections;
 public class EmotionModel
 {
 
-    public enum EmotionIdeal { Active, Excited, Pleasant, Content, Deactive, Bored, Unpleasant, Panic };
+    public enum EmotionIdeal { None=-1, Active=1, Excited=2, Pleasant=3, Content=4,
+        Deactive=5, Bored=6, Unpleasant=7, Panic=8 };
 
     #region Never Touch With Code!!
     private Vector2 _currentStateRaw = Vector2.zero; //do not directly modify!! EVER!

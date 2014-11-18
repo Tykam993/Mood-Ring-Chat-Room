@@ -48,9 +48,12 @@
   <ItemGroup>
      <Compile Include="Assets\JSON Tests\CSharp\Test_CSharp.cs" />
      <Compile Include="Assets\Scripts\Control\ProcessWord.cs" />
+     <Compile Include="Assets\Scripts\Control\ProcessWordEmotions.cs" />
      <Compile Include="Assets\Scripts\Emotion Model\Debug and Visualization\DrawEmotionModel.cs" />
      <Compile Include="Assets\Scripts\Emotion Model\Debug and Visualization\EmotionIdeal.cs" />
      <Compile Include="Assets\Scripts\Emotion Model\EmotionModel.cs" />
+     <Compile Include="Assets\Scripts\MySQL\MySQLDictionary.cs" />
+     <Compile Include="Assets\Scripts\MySQL\Test\MySQLtest.cs" />
      <Compile Include="Assets\Scripts\SynonymDictionary\Debug\TestSynonymDictionary.cs" />
      <Compile Include="Assets\Scripts\SynonymDictionary\Debug\TestSynonymDictionary_Instance.cs" />
      <Compile Include="Assets\Scripts\SynonymDictionary\SynonymDictionary.cs" />
@@ -58,10 +61,20 @@
      <Compile Include="Assets\Scripts\Synonyms\Synonym.cs" />
      <Compile Include="Assets\Scripts\Synonyms\SynonymFinder.cs" />
      <Compile Include="Assets\Scripts\Synonyms\Word.cs" />
+     <Compile Include="Assets\Scripts\Tyler\Emotions.cs" />
+     <Compile Include="Assets\Scripts\Tyler\NetworkManager.cs" />
+     <Compile Include="Assets\Scripts\Tyler\NetworkMenu.cs" />
+     <Compile Include="Assets\Scripts\Tyler\ProcChat2.cs" />
      <Compile Include="Assets\Scripts\Utility\Utility.cs" />
      <None Include="Assets\JSON Tests\TroubleShoot.txt" />
+ <Reference Include="MySql.Data">
+ <HintPath>C:/Users/JarJar/Documents/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/MySQL/MySql.Data.dll</HintPath>
+ </Reference>
  <Reference Include="ICSharpCode.SharpZipLib">
- <HintPath>C:/Users/JarJar/Documents/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/ICSharpCode.SharpZipLib.dll</HintPath>
+ <HintPath>C:/Users/JarJar/Documents/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/SimpleJSON/ICSharpCode.SharpZipLib.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Data">
+ <HintPath>C:/Users/JarJar/Documents/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/SQLite dlls/System.Data.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>

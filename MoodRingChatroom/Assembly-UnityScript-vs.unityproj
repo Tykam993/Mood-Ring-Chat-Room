@@ -48,8 +48,14 @@
   <ItemGroup>
      <Compile Include="Assets\JSON Tests\UnityScript\Test_UnityScript.js" />
      <None Include="Assets\JSON Tests\TroubleShoot.txt" />
+ <Reference Include="MySql.Data">
+ <HintPath>C:/Users/JarJar/Documents/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/MySQL/MySql.Data.dll</HintPath>
+ </Reference>
  <Reference Include="ICSharpCode.SharpZipLib">
- <HintPath>C:/Users/JarJar/Documents/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/ICSharpCode.SharpZipLib.dll</HintPath>
+ <HintPath>C:/Users/JarJar/Documents/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/SimpleJSON/ICSharpCode.SharpZipLib.dll</HintPath>
+ </Reference>
+ <Reference Include="System.Data">
+ <HintPath>C:/Users/JarJar/Documents/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/SQLite dlls/System.Data.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
