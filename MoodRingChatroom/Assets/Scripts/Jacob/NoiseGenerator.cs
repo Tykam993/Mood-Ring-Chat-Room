@@ -53,6 +53,10 @@ public class NoiseGenerator : MonoBehaviour {
 	}
 
 	void GeneratePerlin() {
+		float r = 1.0f-EmotionModel.CurrentState.x/-1.0f;
+		float g = 1.0f-EmotionModel.CurrentState.magnitude;
+		float b = 1.0f-EmotionModel.CurrentState.x/1.0f;
+
 		for(float x = 0.0F; x < noiseTex.width; x++) {
 			for(float y = 0.0F; y < noiseTex.height; y++) {
 				// Scales the coordinates 
@@ -63,7 +67,7 @@ public class NoiseGenerator : MonoBehaviour {
 				float perlinColor = Mathf.PerlinNoise(xCoord/rand, yCoord*rand);
 
 				// Sets the current pixel to the colored noise
-				colorNoise[(int) y * noiseTex.width + (int) x] = new Color(perlinColor, perlinColor, perlinColor);
+				colorNoise[(int) y * noiseTex.width + (int) x] = new Color(perlinColor * r, perlinColor * g, perlinColor * b);
 			}
 		}
 		noiseTex.SetPixels(colorNoise);
