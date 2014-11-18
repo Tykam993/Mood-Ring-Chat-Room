@@ -5,11 +5,11 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{7EEEDC69-520E-5451-F0D3-5BC472D02CAA}</ProjectGuid>
+	<ProjectGuid>{0339C6CA-CFB7-81E5-5B4B-5FFBB6F81159}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
-	<AssemblyName>Assembly-UnityScript</AssemblyName>
+	<AssemblyName>Assembly-CSharp</AssemblyName>
 	<TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
 	<FileAlignment>512</FileAlignment>
 	<BaseDirectory>Assets</BaseDirectory>
@@ -46,7 +46,28 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\JSON Tests\UnityScript\Test_UnityScript.js" />
+     <Compile Include="Assets\JSON Tests\CSharp\Test_CSharp.cs" />
+     <Compile Include="Assets\Scripts\Control\ProcessChatMessage.cs" />
+     <Compile Include="Assets\Scripts\Control\ProcessWord.cs" />
+     <Compile Include="Assets\Scripts\Control\ProcessWordEmotions.cs" />
+     <Compile Include="Assets\Scripts\Emotion Model\Debug and Visualization\DrawEmotionModel.cs" />
+     <Compile Include="Assets\Scripts\Emotion Model\Debug and Visualization\EmotionIdeal.cs" />
+     <Compile Include="Assets\Scripts\Emotion Model\EmotionModel.cs" />
+     <Compile Include="Assets\Scripts\Jacob\NoiseGenerator.cs" />
+     <Compile Include="Assets\Scripts\MySQL\MySQLDictionary.cs" />
+     <Compile Include="Assets\Scripts\MySQL\Test\MySQLtest.cs" />
+     <Compile Include="Assets\Scripts\SynonymDictionary\Debug\TestSynonymDictionary.cs" />
+     <Compile Include="Assets\Scripts\SynonymDictionary\Debug\TestSynonymDictionary_Instance.cs" />
+     <Compile Include="Assets\Scripts\SynonymDictionary\SynonymDictionary.cs" />
+     <Compile Include="Assets\Scripts\Synonyms\Debug\TestSynonymFinder.cs" />
+     <Compile Include="Assets\Scripts\Synonyms\Synonym.cs" />
+     <Compile Include="Assets\Scripts\Synonyms\SynonymFinder.cs" />
+     <Compile Include="Assets\Scripts\Synonyms\Word.cs" />
+     <Compile Include="Assets\Scripts\Tyler\Emotions.cs" />
+     <Compile Include="Assets\Scripts\Tyler\NetworkManager.cs" />
+     <Compile Include="Assets\Scripts\Tyler\NetworkMenu.cs" />
+     <Compile Include="Assets\Scripts\Tyler\ProcChat2.cs" />
+     <Compile Include="Assets\Scripts\Utility\Utility.cs" />
      <None Include="Assets\JSON Tests\TroubleShoot.txt" />
  <Reference Include="MySql.Data">
  <HintPath>/Users/jacobginsparg/Documents/College/Fall 2014/Game AI/ProcJam/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/MySQL/MySql.Data.dll</HintPath>
@@ -59,8 +80,8 @@
  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{01D68A50-AE17-70D6-D254-A8ECF61C49B4}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+    <ProjectReference Include="Assembly-CSharp-firstpass-vs.csproj">
+      <Project>{01D68A50-AE17-70D6-D254-A8ECF61C49B4}</Project>      <Name>Assembly-CSharp-firstpass-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
