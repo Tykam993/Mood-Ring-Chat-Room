@@ -1,4 +1,4 @@
-//This code was written following Brent Farris' "Simple Chat System" tutorial on Youtube.com
+﻿//This code was written following Brent Farris' "Simple Chat System" tutorial on Youtube.com
 //https://www.youtube.com/watch?v=yS_kX8RrovQ
 
 using UnityEngine;

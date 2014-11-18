@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -66,7 +66,7 @@ public class Emotions : MonoBehaviour {
 		"angry", "annoyance", "anxiety", "apprehension", "beleaguered", "calculating", "contempt", "concerned",
 		"crazed", "crazy", "cross", "destroy", "disapproval", "disenchanted", "disgust", "disillusioned",
 		"dismay", "distress", "earnest", "emotional", "enraged", "exasperation", "fear", "fearful", "fright",
-		"frustration", "furious", "fury", "grouchy", "horror", "hostility", "insecurity", "insulted", "irritation",
+		"frustration", "furious", "fury", "grouchy", "hate", "horror", "hostility", "insecurity", "insulted", "irritation",
 		"jealous", "kick", "kill", "loathing", "longing", "mad", "mortification", "nervous", "ornery", "outrage",
 		"panic", "pwn", "quarrelsome", "rage", "ragequit", "relief", "relieved", "repentance", "resentment",
 		"revulsion", "scared", "shame", "shoot", "spite", "stressed", "terror", "threatening", "torment", "troll",

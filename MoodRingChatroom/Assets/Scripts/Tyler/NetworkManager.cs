@@ -1,4 +1,4 @@
-//This code was written following Code Compile's "Unity3D Series - Networking Part 1" tutorial on Youtube
+﻿//This code was written following Code Compile's "Unity3D Series - Networking Part 1" tutorial on Youtube
 // https://www.youtube.com/watch?v=GEnkgqSH51E
 
 using UnityEngine;

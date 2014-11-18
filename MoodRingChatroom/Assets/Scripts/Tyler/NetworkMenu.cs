@@ -1,4 +1,4 @@
-//This code was written following Brent Farris' "Networking 2: Introduction" tutorial on Youtube.com
+﻿//This code was written following Brent Farris' "Networking 2: Introduction" tutorial on Youtube.com
 //https://www.youtube.com/watch?v=TgFyJK9gits&list=UUStD9dM0fAPxyJqrWWwFHPQ&index=21
 using UnityEngine;
 using System.Collections;
