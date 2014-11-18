@@ -13,6 +13,7 @@ public class NoiseGenerator : MonoBehaviour {
 	// Adds randomness to the colored noise
 	private float rand = 5.0F;
 	private float change = 1f;
+	private float flux = 0.05f;
 
 	// The texture
 	private Texture2D noiseTex;
@@ -36,10 +37,17 @@ public class NoiseGenerator : MonoBehaviour {
 		// MAKE. SOME. NOISE.
 		GeneratePerlin();
 
-		// 
-		rand = rand+0.05f*change;
+		// Compensates for active/deactive states of emotion
+		if(EmotionModel.CurrentState.y < 0) {
+			flux = 0.01f;
+		}
+		else if(EmotionModel.CurrentState.y >= 0) {
+			flux = 0.05f;
+		}
+
+		// Changes the random factor
+		rand = rand+flux*change;
 		if(rand > 20f || rand < 5f) {
-			print("switch");
 			change*=-1f;;
 		}
 	}
