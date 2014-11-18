@@ -66,7 +66,7 @@ public class ProcessWord {
     /// </summary>
     /// <param name="word">The word with its synonyms. Note this word could be garbage!</param>
     /// <returns></returns>
-    public static Word CallMeWhenDonePingingServer(Word word)
+    private static Word CallMeWhenDonePingingServer(Word word)
     {
         string wordStr = word.GetWord();
 

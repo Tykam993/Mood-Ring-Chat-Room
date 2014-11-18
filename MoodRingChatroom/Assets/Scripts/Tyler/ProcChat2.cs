@@ -37,6 +37,10 @@ public class ProcChat2 : MonoBehaviour {
 
 			if(!string.IsNullOrEmpty(currentMessage.Trim())) {
 				networkView.RPC("ChatMessage", RPCMode.AllBuffered, new object[] {currentMessage });
+
+                //in here process the current message sent!
+                ProcessChatMessage.ProcessChat(currentMessage);
+
 				currentMessage = string.Empty;
 			}
 
