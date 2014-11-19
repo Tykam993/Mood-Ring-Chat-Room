@@ -199,6 +199,8 @@ public class MySQLDictionary : MonoBehaviour {
             }
         }
 
+        yield return null;
+
         StartCoroutine("ProcessRequestLoop");
     }
 
