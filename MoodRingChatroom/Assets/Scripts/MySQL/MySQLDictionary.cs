@@ -116,7 +116,6 @@ public class MySQLDictionary : MonoBehaviour {
     {
         //We create the WVObject, and pass it to the coroutine
         WVObject<bool?> result = new WVObject<bool?>(word);
-        Instance.StartCoroutine(Instance.DatabaseContains(word, result));
 
         Request newRequest = new Request();
         newRequest.type = RequestType.Contains;
@@ -132,7 +131,6 @@ public class MySQLDictionary : MonoBehaviour {
     {
         //We create the WVObject, and pass it to the coroutine
         WVObject<WordAndEmoIdeal> result = new WVObject<WordAndEmoIdeal>(word);
-        Instance.StartCoroutine(Instance.GetWord(word));
 
         Request newRequest = new Request();
         newRequest.type = RequestType.Get;
@@ -174,6 +172,7 @@ public class MySQLDictionary : MonoBehaviour {
             }
 
             //Now start the request loop
+            Instance.StartCoroutine(Instance.ProcessRequestLoop());
         }
         catch (MySqlException e)
         {
