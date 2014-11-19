@@ -272,21 +272,21 @@ public class MySQLDictionary : MonoBehaviour {
             while (!asyncResult.IsCompleted) { yield return null; }
             //Debug.Log(asyncResult.AsyncState);
             //Debug.Log(asyncResult.IsCompleted);
-            MySqlDataReader data;
-            using (data = command.EndExecuteReader(asyncResult))
+            try
             {
-                while (data == null)
+                MySqlDataReader data;
+                using (data = command.EndExecuteReader(asyncResult))
                 {
-                    //Debug.Log(command.CommandText);
-                    Debug.LogWarning("warning! DatabaseContains(" + word + ") returned null!");
-                    yield return new WaitForSeconds(10f);
-                    //Debug.Log(command);
-                    //Debug.Log(asyncResult);
-                    data = command.EndExecuteReader(asyncResult);
+                    result.value = data.Read();
+                    Debug.Log("DatabaseContains word '" + word + "': " + result.value.ToString());
+                    //if (!data.IsClosed) data.Close();
                 }
-                result.value = data.Read();
-                Debug.Log("DatabaseContains word '" + word + "': " + result.value.ToString());
-                //if (!data.IsClosed) data.Close();
+            }
+            catch (System.InvalidOperationException e)
+            {
+                Debug.LogError(e.StackTrace);
+                Debug.LogError(e.Message);
+                Debug.Log(Connection.State.ToString());
             }
         }
     }
@@ -322,7 +322,7 @@ public class MySQLDictionary : MonoBehaviour {
                 MySqlDataReader data;
                 using (data = command.EndExecuteReader(asyncResult))
                 {
-                    Debug.LogWarning("before data.Read()");
+                    //Debug.LogWarning("before data.Read()");
                     while (data.Read())
                     {
                         string w = (string)data[TABLE_WORD];
@@ -334,19 +334,20 @@ public class MySQLDictionary : MonoBehaviour {
                         wordEmoIdeal.emoEnum = emoIdeal;
 
                         result.value = wordEmoIdeal;//at this point, since it's not null, we set it!
-                        Debug.LogWarning("reading data");
+                        //Debug.LogWarning("reading data");
                     }
                     Debug.LogWarning("Data.isClosed = " + data.IsClosed.ToString());
                     //if (!data.IsClosed) data.Close();
                 }
-                Debug.LogWarning("Data.isClosed AFTER using: " + data.IsClosed.ToString());
+                //Debug.LogWarning("Data.isClosed AFTER using: " + data.IsClosed.ToString());
 
-                Debug.Log("Connection after everything: " + Connection.State.ToString());
+                //Debug.Log("Connection after everything: " + Connection.State.ToString());
             }
             catch (System.InvalidOperationException e)
             {
                 Debug.LogError(e.StackTrace);
                 Debug.LogError(e.Message);
+                Debug.Log(Connection.State);
             }
 
         }

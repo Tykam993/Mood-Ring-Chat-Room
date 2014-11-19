@@ -45,6 +45,9 @@ public class EmotionModel
     public enum EmotionIdeal { None=-1, Active=1, Excited=2, Pleasant=3, Content=4,
         Deactive=5, Bored=6, Unpleasant=7, Panic=8 };
 
+    private float _minWeight = .1f;
+    private float _maxWeight = .2f;
+
     #region Never Touch With Code!!
     private Vector2 _currentStateRaw = Vector2.zero; //do not directly modify!! EVER!
     #endregion
@@ -161,12 +164,11 @@ public class EmotionModel
 
     private void UpdateWeight()
     {
-        float maxWeight = .1f, minWeight = .01f;
 
         float currentProgress = (float)NumberOfModifications / 100f;
         if (currentProgress > 1f) { currentProgress = 1f; }
 
-        _weight = Mathf.Lerp(maxWeight, minWeight, currentProgress);
+        _weight = Mathf.Lerp(_maxWeight, _minWeight, currentProgress);
 
         //Debug.Log("Current Weight: " + Weight.ToString());
     }
