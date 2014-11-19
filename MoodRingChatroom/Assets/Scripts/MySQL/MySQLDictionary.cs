@@ -26,6 +26,8 @@ public class MySQLDictionary : MonoBehaviour {
         }
     }
 
+    private bool _hasStartedRequestLoop = false;
+
     private List<WVObject<WordAndEmoIdeal>> _wvObjectList_WordAndEmoIdeal; //this is a list of WVObjects, which stands for Word and Value Object
     private List<WVObject<WordAndEmoIdeal>> WVObjectList_WordAndEmoIdeal
     {
@@ -179,7 +181,12 @@ public class MySQLDictionary : MonoBehaviour {
             Debug.Log("Connection State: " + Instance._connection.State.ToString());
 
             //Now start the request loop
-            Instance.StartCoroutine(Instance.ProcessRequestLoop());
+            if (!Instance._hasStartedRequestLoop)
+            {
+                Instance._hasStartedRequestLoop = true;
+                Instance.StartCoroutine(Instance.ProcessRequestLoop());
+            }
+            
 
             //AddEntry("testString", EmotionModel.EmotionIdeal.Active);
             //DatabaseContainsEntry("testString");

@@ -99,9 +99,15 @@ public class ProcessWord : MonoBehaviour{
         }
         //TO-DO: Now that we have the filled word, we need to get the EmotionIdeal it represents!
         List<EmotionModel.EmotionIdeal> emoIdealList = new List<EmotionModel.EmotionIdeal>();
+
+        EmotionModel.EmotionIdeal emotionIdeal = Emotions.GetEmotionIdealAssociated(word.GetWord());
+        if (emotionIdeal != EmotionModel.EmotionIdeal.None )
+        {
+            emoIdealList.Add(emotionIdeal);
+        }
         foreach (string synonym in word.GetSynonyms())
         {
-            EmotionModel.EmotionIdeal emotionIdeal = Emotions.GetEmotionIdealAssociated(synonym);
+            emotionIdeal = Emotions.GetEmotionIdealAssociated(synonym);
             if (emotionIdeal != EmotionModel.EmotionIdeal.None)
             {
                 emoIdealList.Add(emotionIdeal);
@@ -112,7 +118,7 @@ public class ProcessWord : MonoBehaviour{
             //pick a random emotion ideal in the list
             int randIndex = Random.Range(0, emoIdealList.Count-1);
 
-            EmotionModel.EmotionIdeal emotionIdeal = emoIdealList[randIndex];
+            emotionIdeal = emoIdealList[randIndex];
 
             //And then have it affect the emotional model
             MySQLDictionary.AddEntry(wordStr, emotionIdeal);

@@ -35,7 +35,7 @@ public class ProcChat2 : MonoBehaviour
 
 				currentMessage = GUILayout.TextField (currentMessage);
 
-				if (GUILayout.Button ("Send") || (Input.GetKeyDown (KeyCode.Return))) {
+				if (GUILayout.Button ("Send") || (Event.current.keyCode == KeyCode.Return)) {
 
 						if (!string.IsNullOrEmpty (currentMessage.Trim ())) {
 								networkView.RPC ("ChatMessage", RPCMode.AllBuffered, new object[] {currentMessage });

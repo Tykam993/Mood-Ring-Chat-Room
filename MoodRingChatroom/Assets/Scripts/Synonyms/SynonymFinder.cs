@@ -113,6 +113,7 @@ public class SynonymFinder : MonoBehaviour
 #endif
         }//do nothing while it's processing
 
+        // HANDLE ERRORS HERE!
         if (returnedQuery.error != null) {
             if (returnedQuery.error.ToLower().Contains("404 not found"))
             {
@@ -121,32 +122,32 @@ public class SynonymFinder : MonoBehaviour
             }
         }
         else {
-                  string jsonString = returnedQuery.text; //for now we only support JSON
+            string jsonString = returnedQuery.text; //for now we only support JSON
 
-        var N = JSON.Parse(jsonString);
+            var N = JSON.Parse(jsonString);
 
-        //JSON parsing//
-        JSONArray arr;
-        string[] typesOfSpeech = { "verb", "adverb", "noun", "adjective" };
-        foreach (string key in typesOfSpeech)
-        {
-            if (N[key] != null)
+            //JSON parsing//
+            JSONArray arr;
+            string[] typesOfSpeech = { "verb", "adverb", "noun", "adjective" };
+            foreach (string key in typesOfSpeech)
             {
-                if (N[key]["syn"] != null)
+                if (N[key] != null)
                 {
-                    arr = N[key]["syn"].AsArray;
-                    foreach (JSONNode str in arr)
+                    if (N[key]["syn"] != null)
                     {
-                        //Only add the word if it doesn't contain a space
-                        if (!str.Value.Contains(" "))
+                        arr = N[key]["syn"].AsArray;
+                        foreach (JSONNode str in arr)
                         {
-                            string sanString = Utility.SanitizeString(str.Value);
-                            result.AddWord(sanString);
+                            //Only add the word if it doesn't contain a space
+                            if (!str.Value.Contains(" "))
+                            {
+                                string sanString = Utility.SanitizeString(str.Value);
+                                result.AddWord(sanString);
+                            }
                         }
                     }
                 }
             }
-        }
         }
   
 
