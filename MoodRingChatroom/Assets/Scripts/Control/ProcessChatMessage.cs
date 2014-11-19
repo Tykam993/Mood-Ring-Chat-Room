@@ -7,7 +7,7 @@ using System.Linq;
 /// to do with them. Specifically, it will delimit the message and discard any common non-emotional
 /// words. And then process em.
 /// </summary>
-public class ProcessChatMessage {
+public class ProcessChatMessage : MonoBehaviour {
 
     private static string[] common_words = new string[]
     {

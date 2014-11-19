@@ -1,17 +1,48 @@
 ﻿using UnityEngine;
 using System.Collections;
 using MySql.Data.MySqlClient;
-
+using System.Collections.Generic;
+using System.Linq;
 public class MySQLDictionary : MonoBehaviour {
-    public struct WordAndEmoIdeal {
-        public string word;
-        public EmotionModel.EmotionIdeal emoEnum;
 
-        public WordAndEmoIdeal(string w, EmotionModel.EmotionIdeal e)
+    public enum RequestType { Contains, Get, Add };
+    public struct Request
+    {
+        public RequestType type;
+        public string word;
+        public WVObject<bool?> boolResult;
+        public WVObject<WordAndEmoIdeal> wordEmoIdealResult;
+        public EmotionModel.EmotionIdeal emotionIdeal;
+    }
+    private Queue<Request> _requestQueue;
+    private Queue<Request> RequestQueue
+    {
+        get
         {
-            word = w;
-            emoEnum = e;
+            if (_requestQueue == null) { _requestQueue = new Queue<Request>(); }
+            return _requestQueue;
         }
+    }
+
+    private List<WVObject<WordAndEmoIdeal>> _wvObjectList_WordAndEmoIdeal; //this is a list of WVObjects, which stands for Word and Value Object
+    private List<WVObject<WordAndEmoIdeal>> WVObjectList_WordAndEmoIdeal
+    {
+        get { if (_wvObjectList_WordAndEmoIdeal == null)
+        { 
+            _wvObjectList_WordAndEmoIdeal = new List<WVObject<WordAndEmoIdeal>>(); } return _wvObjectList_WordAndEmoIdeal;
+        }
+    }
+
+    /// <summary>
+    /// this is a list of contains object requests. Basically, when we want to see if a word is in the database,
+    /// we create a new WVObject of type bool which--once it's finished contacting the db--will say whether it
+    /// contians the word or not.
+    /// </summary>
+    private List<WVObject<bool?>> _wvObjectList_bool; //this is a list of WVObjects, which stands for Word and Value Object
+    private List<WVObject<bool?>> WVObjectList_Bool
+    {
+        get { if (WVObjectList_Bool == null) { _wvObjectList_bool = new List<WVObject<bool?>>(); } return _wvObjectList_bool; }
+        set { _wvObjectList_bool = value; }
     }
 
     public const int MAX_WORD_LENGTH = 30;
@@ -69,22 +100,48 @@ public class MySQLDictionary : MonoBehaviour {
 
     public static void AddEntry(string word, EmotionModel.EmotionIdeal emotionIdeal)
     {
-        Instance.AddEntryToDatabase(word, emotionIdeal);
+        //We create the WVObject, and pass it to the coroutine
+        WVObject<bool?> result = new WVObject<bool?>(word);
+
+        Request newRequest = new Request();
+        newRequest.type = RequestType.Add;
+        newRequest.word = word;
+        newRequest.emotionIdeal = emotionIdeal;
+        newRequest.boolResult = result;
+
+        Instance.RequestQueue.Enqueue(newRequest);
     }
 
-    public static bool DatabaseContainsEntry(string word)
+    public static WVObject<bool?> DatabaseContainsEntry(string word)
     {
-        return Instance.DatabaseContains(word);
+        //We create the WVObject, and pass it to the coroutine
+        WVObject<bool?> result = new WVObject<bool?>(word);
+        Instance.StartCoroutine(Instance.DatabaseContains(word, result));
+
+        Request newRequest = new Request();
+        newRequest.type = RequestType.Contains;
+        newRequest.word = word;
+        newRequest.boolResult = result;
+
+        Instance.RequestQueue.Enqueue(newRequest);
+
+        return result;
     }
 
-    public static WordAndEmoIdeal GetWordFromDatabase(string word)
+    public static WVObject<WordAndEmoIdeal> GetWordFromDatabase(string word)
     {
-        return Instance.GetWord(word);
-    }
+        //We create the WVObject, and pass it to the coroutine
+        WVObject<WordAndEmoIdeal> result = new WVObject<WordAndEmoIdeal>(word);
+        Instance.StartCoroutine(Instance.GetWord(word));
 
-    public static void InsertIntoDatabase(string word, EmotionModel.EmotionIdeal emoIdeal)
-    {
+        Request newRequest = new Request();
+        newRequest.type = RequestType.Get;
+        newRequest.word = word;
+        newRequest.wordEmoIdealResult = result;
 
+        Instance.RequestQueue.Enqueue(newRequest);
+
+        return result;
     }
 
     #endregion
@@ -115,11 +172,35 @@ public class MySQLDictionary : MonoBehaviour {
                 Instance._connection = new MySqlConnection(_source);
                 Instance._connection.Open();
             }
+
+            //Now start the request loop
         }
         catch (MySqlException e)
         {
             throw e;
         }
+    }
+
+    private IEnumerator ProcessRequestLoop()
+    {
+        if (RequestQueue.Count > 0)
+        {
+            Request r = RequestQueue.Dequeue();
+            switch (r.type)
+            {
+                case RequestType.Add:
+                    yield return StartCoroutine(Instance.AddEntryToDatabase(r.word, r.emotionIdeal, r.boolResult));
+                    break;
+                case RequestType.Contains:
+                    yield return StartCoroutine(Instance.DatabaseContains(r.word, r.boolResult));
+                    break;
+                case RequestType.Get:
+                    yield return StartCoroutine(Instance.GetWord(r.word));
+                    break;
+            }
+        }
+
+        StartCoroutine("ProcessRequestLoop");
     }
 
     /// <summary>
@@ -128,25 +209,36 @@ public class MySQLDictionary : MonoBehaviour {
     /// </summary>
     /// <param name="word">The string to enter as the word</param>
     /// <param name="emotionIdeal">The emotion ideal to associate with word</param>
-    private void AddEntryToDatabase(string word, EmotionModel.EmotionIdeal emotionIdeal)
+    private IEnumerator AddEntryToDatabase(string word, EmotionModel.EmotionIdeal emotionIdeal, WVObject<bool?> result)
     {
         MySqlCommand command = _connection.CreateCommand();
         command.CommandText = "INSERT INTO " + TABLE_NAME + "(" + TABLE_WORD + ", " + TABLE_EMO_IDEAL + ")" +
             " VALUES" + "('" + word + "', " + "'" + ((int)emotionIdeal).ToString() + "');";
 
-        command.ExecuteNonQuery();
+        System.IAsyncResult asyncResult = command.BeginExecuteNonQuery();
+
+        while (!asyncResult.IsCompleted) { yield return null; }
+
+        command.EndExecuteNonQuery(asyncResult);
+
+        result.value = true;
     }
 
 
-    private bool DatabaseContains(string word)
+    private IEnumerator DatabaseContains(string word, WVObject<bool?> result)
     {
+
         MySqlCommand command = _connection.CreateCommand();
         command.CommandText = "SELECT " + TABLE_WORD + " FROM " + TABLE_NAME +
             " WHERE " + TABLE_WORD + " = " + "'" + word + "'";
 
-        MySqlDataReader data = command.ExecuteReader();
+        System.IAsyncResult asyncResult = command.BeginExecuteReader();
 
-        return data.Read();
+        while (!asyncResult.IsCompleted) { yield return null; }
+
+        MySqlDataReader data = command.EndExecuteReader(asyncResult);
+
+        result.value = data.Read();
     }
 
     /// <summary>
@@ -155,15 +247,23 @@ public class MySQLDictionary : MonoBehaviour {
     /// </summary>
     /// <param name="word">Word to search for</param>
     /// <returns>WordAndEmoIdeal -- struct containing string and emotion ideal</returns>
-    private WordAndEmoIdeal GetWord(string word)
+    private IEnumerator GetWord(string word)
     {
-        WordAndEmoIdeal result = new WordAndEmoIdeal();
+        WVObject<WordAndEmoIdeal> result = new WVObject<WordAndEmoIdeal>(word);
+
+        WVObjectList_WordAndEmoIdeal.Add(result);
+
+        WordAndEmoIdeal wordEmoIdeal = new WordAndEmoIdeal();
 
         MySqlCommand command = _connection.CreateCommand();
         command.CommandText = "SELECT " + TABLE_WORD + ", " + TABLE_EMO_IDEAL + " FROM " + TABLE_NAME +
             " WHERE " + TABLE_WORD + " = " + "'" + word + "'";
 
-        MySqlDataReader data = command.ExecuteReader();
+         System.IAsyncResult asyncResult = command.BeginExecuteReader();
+
+         while (!asyncResult.IsCompleted) { yield return null; }
+
+         MySqlDataReader data = command.EndExecuteReader(asyncResult);
 
         while (data.Read())
         {
@@ -172,10 +272,74 @@ public class MySQLDictionary : MonoBehaviour {
                 System.Enum.Parse(typeof(EmotionModel.EmotionIdeal), 
                 (string)data[TABLE_EMO_IDEAL]);
 
-            result.word = w;
-            result.emoEnum = emoIdeal;
+            wordEmoIdeal.word = w;
+            wordEmoIdeal.emoEnum = emoIdeal;
+
+            result.value = wordEmoIdeal;//at this point, since it's not null, we set it!
+        }
+    }
+
+    public class WVObject<T>
+    {
+
+        public T value;
+
+        public bool IsDone
+        {
+            get { return value != null; }
         }
 
-        return result;
+        private string _wordName;
+        public string WordName
+        {
+            get { return _wordName; }
+        }
+
+        public WVObject(string wordName)
+        {
+            _wordName = wordName;
+        }
+
+        // can directly compare a WVObject to a string!
+        public override bool Equals(object obj)
+        {
+            if (obj == null) { return false; }
+
+            if (obj is string)
+            {
+                return (WordName == obj);
+            }
+
+            if (obj is WVObject<T>)
+            {
+                WVObject<T> other = (WVObject<T>)obj;
+                return WordName == other.WordName && value.Equals(value);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return WordName.GetHashCode() + value.GetHashCode();
+        }
+    }
+
+
+    public class WordAndEmoIdeal
+    {
+        public string word;
+        public EmotionModel.EmotionIdeal emoEnum;
+
+        public WordAndEmoIdeal(string w, EmotionModel.EmotionIdeal e)
+        {
+            word = w;
+            emoEnum = e;
+        }
+
+        public WordAndEmoIdeal()
+        {
+            word = "";
+            emoEnum = EmotionModel.EmotionIdeal.None;
+        }
     }
 }

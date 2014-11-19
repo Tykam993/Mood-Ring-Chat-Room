@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// whether we ping the web server or if we can get the word from our local dictionary.
 /// It's also responsible for creating Synonym objects and passing them along.
 /// </summary>
-public class ProcessWord {
+public class ProcessWord : MonoBehaviour{
 
     private static ProcessWord _instance;
     private static ProcessWord Instance
@@ -25,8 +25,13 @@ public class ProcessWord {
 
     public static void Process(string word)
     {
+        Instance.StartCoroutine(Instance.ProcessCo(word));
+    }
+
+    private IEnumerator ProcessCo(string word)
+    {
         //First throw the word out if it's too long!
-        if (word.Length > MySQLDictionary.MAX_WORD_LENGTH) { return; }
+        if (word.Length > MySQLDictionary.MAX_WORD_LENGTH) { yield break ; }
         word = Utility.SanitizeString(word);
 
         ////Now determine if we already have the word!
@@ -38,12 +43,16 @@ public class ProcessWord {
         //    //TO-DO: Now that we have the synonyms, send it to a controller that converts the strings into a list of EmotionIdeals
         //    CallMeToPassOnWord(wordWithSynonyms);
         //}
-        if (MySQLDictionary.DatabaseContainsEntry(word))
+        MySQLDictionary.WVObject<bool?> dbHasWord = MySQLDictionary.DatabaseContainsEntry(word);
+        while (!dbHasWord.IsDone) { yield return null; }
+        if ((bool)dbHasWord.value)
         {
-            MySQLDictionary.WordAndEmoIdeal result = MySQLDictionary.GetWordFromDatabase(word);
+            MySQLDictionary.WVObject<MySQLDictionary.WordAndEmoIdeal> result = MySQLDictionary.GetWordFromDatabase(word);
+
+            while (!result.IsDone) { yield return null; }
 
             //Now that we have the word and emotion ideal, we can pass add it to our model
-            EmotionModel.ChangeStateByAddingEmotions(result.emoEnum);
+            EmotionModel.ChangeStateByAddingEmotions(result.value.emoEnum);
         }
         else //else we need to ping the server!
         {
@@ -54,7 +63,7 @@ public class ProcessWord {
              * In this case, after getting the synonyms we want to
              *  - Add the new word/synonynms to the dictionary
              *  - Do something with the new Word object, to convert it into EmotionIdeals */
-            System.Func<Word,Word> callback = CallMeWhenDonePingingServer;
+            System.Func<Word, Word> callback = CallMeWhenDonePingingServer;
             Synonym newWord = new Synonym(word, callback);
         }
     }

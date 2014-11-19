@@ -11,7 +11,7 @@ public class Synonym
         {
             if (_word == null)
             {
-                return new Word();
+                _word = new Word();
             }
             return _word;
         }

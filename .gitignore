@@ -23,3 +23,7 @@ MoodRingChatroom/Assembly-CSharp-firstpass.csproj
 MoodRingChatroom/Assets/Scripts/Control/ProcessWordEmotions.cs.meta
 MoodRingChatroom/MoodRingChatroom-csharp.sln
 MoodRingChatroom/MoodRingChatroom-csharp.v12.suo
+MoodRingChatroom/Assembly-CSharp-vs.csproj
+MoodRingChatroom/Assembly-CSharp.csproj
+MoodRingChatroom/Assets/Scripts/IInteractableObject.cs
+MoodRingChatroom/Assets/Scripts/IInteractableObject.cs.meta
