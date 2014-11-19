@@ -5,6 +5,11 @@ using System.Collections.Generic;
 public class Word
 {
     private string _word;
+    public string WordString
+    {
+        get { return _word; }
+        set { _word = value; }
+    }
     private List<string> synonyms;
     public bool isDone;
 

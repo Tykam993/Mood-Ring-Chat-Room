@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// This class' main (and only public static function) takes in a string, representing
@@ -17,15 +18,26 @@ public class ProcessWord : MonoBehaviour{
         {
             if (_instance == null)
             {
-                _instance = new ProcessWord();
+                _instance = new GameObject().AddComponent<ProcessWord>();
+                _instance.name = "Process Word GameObject";
             }
-            return Instance;
+            return _instance;
         }
     }
 
     public static void Process(string word)
     {
-        Instance.StartCoroutine(Instance.ProcessCo(word));
+        
+        string[] words = word.Split(new char[] { ' ' });
+        string[] distinctWords = words.Distinct().ToArray();
+        foreach (string w in distinctWords)
+        {
+            string newW = Utility.SanitizeString(w);
+            if (!ProcessChatMessage.common_words.Any(wrd => wrd == newW))
+            {
+                Instance.StartCoroutine(Instance.ProcessCo(newW));
+            }  
+        }
     }
 
     private IEnumerator ProcessCo(string word)
@@ -48,16 +60,16 @@ public class ProcessWord : MonoBehaviour{
         if ((bool)dbHasWord.value)
         {
             MySQLDictionary.WVObject<MySQLDictionary.WordAndEmoIdeal> result = MySQLDictionary.GetWordFromDatabase(word);
-
+        
             while (!result.IsDone) { yield return null; }
-
+        
             //Now that we have the word and emotion ideal, we can pass add it to our model
             EmotionModel.ChangeStateByAddingEmotions(result.value.emoEnum);
         }
         else //else we need to ping the server!
         {
             //SynonymFinder.OnSynonymCompleteDelegate synDelegate = Instance.CallMeWhenDonePingingServer();
-
+        
             /* This will create a get request for a new Word that will be populated with the word's
              * synonyms. The callback is what's called once it's finished getting the synonyms.
              * In this case, after getting the synonyms we want to
@@ -77,21 +89,39 @@ public class ProcessWord : MonoBehaviour{
     /// <returns></returns>
     private static Word CallMeWhenDonePingingServer(Word word)
     {
+        Debug.Log("New synonym done pinging server for word: " + word.GetWord());
         string wordStr = word.GetWord();
 
         if (word.IsGarbage())
         {
+            Debug.Log("word '" + word.GetWord() + "' thrown away, since it's garbage");
             return word;
         }
         //TO-DO: Now that we have the filled word, we need to get the EmotionIdeal it represents!
-        EmotionModel.EmotionIdeal emotionIdeal = Emotions.GetEmotionIdealAssociated(wordStr);
-
-        //Add the new entry to the database, as long as it's not None.
-        //And then have it affect the emotional model
-        if (emotionIdeal != EmotionModel.EmotionIdeal.None)
+        List<EmotionModel.EmotionIdeal> emoIdealList = new List<EmotionModel.EmotionIdeal>();
+        foreach (string synonym in word.GetSynonyms())
         {
+            EmotionModel.EmotionIdeal emotionIdeal = Emotions.GetEmotionIdealAssociated(synonym);
+            if (emotionIdeal != EmotionModel.EmotionIdeal.None)
+            {
+                emoIdealList.Add(emotionIdeal);
+            }
+        }
+
+        if (emoIdealList.Count > 0) {
+            //pick a random emotion ideal in the list
+            int randIndex = Random.Range(0, emoIdealList.Count-1);
+
+            EmotionModel.EmotionIdeal emotionIdeal = emoIdealList[randIndex];
+
+            //And then have it affect the emotional model
             MySQLDictionary.AddEntry(wordStr, emotionIdeal);
             EmotionModel.ChangeStateByAddingEmotions(emotionIdeal);
+        }
+
+        else
+        {
+            Debug.Log("Word: " + word.GetWord() + " : has no associated emotion ideal");
         }
 
         ////add the new word to the dictionary

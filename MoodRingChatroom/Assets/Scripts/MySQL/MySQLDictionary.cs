@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 public class MySQLDictionary : MonoBehaviour {
 
+    public const float IN_BETWEEN_WAIT = 1f;
+
     public enum RequestType { Contains, Get, Add };
     public struct Request
     {
@@ -75,6 +77,10 @@ public class MySQLDictionary : MonoBehaviour {
         get
         {
             if (Instance._connection == null)
+            {
+                Connect();
+            }
+            else if (Instance._connection.State == System.Data.ConnectionState.Closed)
             {
                 Connect();
             }
@@ -160,19 +166,25 @@ public class MySQLDictionary : MonoBehaviour {
 
         try
         {
-            if (Instance._connection != null && Instance._connection.State != System.Data.ConnectionState.Open)
+            if (Instance._connection != null && Instance._connection.State == System.Data.ConnectionState.Closed)
             {
-                Instance._connection.Close();
-                Connection.Open();
+                Instance._connection.Open();
             }
-            else
+            else if (Instance._connection == null)
             {
                 Instance._connection = new MySqlConnection(_source);
                 Instance._connection.Open();
             }
 
+            Debug.Log("Connection State: " + Instance._connection.State.ToString());
+
             //Now start the request loop
             Instance.StartCoroutine(Instance.ProcessRequestLoop());
+
+            //AddEntry("testString", EmotionModel.EmotionIdeal.Active);
+            //DatabaseContainsEntry("testString");
+            //GetWordFromDatabase("testString");
+
         }
         catch (MySqlException e)
         {
@@ -182,23 +194,33 @@ public class MySQLDictionary : MonoBehaviour {
 
     private IEnumerator ProcessRequestLoop()
     {
+        bool _foundRequest=false;
+        string _rType = "";
+
         if (RequestQueue.Count > 0)
         {
+            _foundRequest = true;
             Request r = RequestQueue.Dequeue();
+            Debug.Log("Starting new request: " + r.type.ToString());
+            _rType = r.type.ToString();
             switch (r.type)
             {
                 case RequestType.Add:
                     yield return StartCoroutine(Instance.AddEntryToDatabase(r.word, r.emotionIdeal, r.boolResult));
+                    yield return new WaitForSeconds(IN_BETWEEN_WAIT);
                     break;
                 case RequestType.Contains:
                     yield return StartCoroutine(Instance.DatabaseContains(r.word, r.boolResult));
+                    yield return new WaitForSeconds(IN_BETWEEN_WAIT);
                     break;
                 case RequestType.Get:
-                    yield return StartCoroutine(Instance.GetWord(r.word));
+                    yield return StartCoroutine(Instance.GetWord(r.word, r.wordEmoIdealResult));
+                    yield return new WaitForSeconds(IN_BETWEEN_WAIT);
                     break;
             }
         }
 
+        if (_foundRequest) { Debug.Log("Finished request: " + _rType); }
         yield return null;
 
         StartCoroutine("ProcessRequestLoop");
@@ -212,34 +234,54 @@ public class MySQLDictionary : MonoBehaviour {
     /// <param name="emotionIdeal">The emotion ideal to associate with word</param>
     private IEnumerator AddEntryToDatabase(string word, EmotionModel.EmotionIdeal emotionIdeal, WVObject<bool?> result)
     {
-        MySqlCommand command = _connection.CreateCommand();
-        command.CommandText = "INSERT INTO " + TABLE_NAME + "(" + TABLE_WORD + ", " + TABLE_EMO_IDEAL + ")" +
+        Debug.Log("Adding entry " + word + " to db");
+        using (MySqlCommand command = _connection.CreateCommand())
+        {
+            command.CommandText = "INSERT INTO " + TABLE_NAME + "(" + TABLE_WORD + ", " + TABLE_EMO_IDEAL + ")" +
             " VALUES" + "('" + word + "', " + "'" + ((int)emotionIdeal).ToString() + "');";
 
-        System.IAsyncResult asyncResult = command.BeginExecuteNonQuery();
+            System.IAsyncResult asyncResult = command.BeginExecuteNonQuery();
 
-        while (!asyncResult.IsCompleted) { yield return null; }
+            while (!asyncResult.IsCompleted) { yield return null; }
 
-        command.EndExecuteNonQuery(asyncResult);
+            command.EndExecuteNonQuery(asyncResult);
 
-        result.value = true;
+            result.value = true;
+        }
     }
 
 
     private IEnumerator DatabaseContains(string word, WVObject<bool?> result)
     {
+        Debug.Log("Checking if db contains word " + word);
 
-        MySqlCommand command = _connection.CreateCommand();
-        command.CommandText = "SELECT " + TABLE_WORD + " FROM " + TABLE_NAME +
-            " WHERE " + TABLE_WORD + " = " + "'" + word + "'";
+        using (MySqlCommand command = _connection.CreateCommand())
+        {
+            command.CommandText = "SELECT " + TABLE_WORD + " FROM " + TABLE_NAME +
+    " WHERE " + TABLE_WORD + " = " + "'" + word + "'";
 
-        System.IAsyncResult asyncResult = command.BeginExecuteReader();
+            System.IAsyncResult asyncResult = command.BeginExecuteReader();
 
-        while (!asyncResult.IsCompleted) { yield return null; }
-
-        MySqlDataReader data = command.EndExecuteReader(asyncResult);
-
-        result.value = data.Read();
+            while (!asyncResult.IsCompleted) { yield return null; }
+            //Debug.Log(asyncResult.AsyncState);
+            //Debug.Log(asyncResult.IsCompleted);
+            MySqlDataReader data;
+            using (data = command.EndExecuteReader(asyncResult))
+            {
+                while (data == null)
+                {
+                    //Debug.Log(command.CommandText);
+                    Debug.LogWarning("warning! DatabaseContains(" + word + ") returned null!");
+                    yield return new WaitForSeconds(10f);
+                    //Debug.Log(command);
+                    //Debug.Log(asyncResult);
+                    data = command.EndExecuteReader(asyncResult);
+                }
+                result.value = data.Read();
+                Debug.Log("DatabaseContains word '" + word + "': " + result.value.ToString());
+                //if (!data.IsClosed) data.Close();
+            }
+        }
     }
 
     /// <summary>
@@ -248,35 +290,58 @@ public class MySQLDictionary : MonoBehaviour {
     /// </summary>
     /// <param name="word">Word to search for</param>
     /// <returns>WordAndEmoIdeal -- struct containing string and emotion ideal</returns>
-    private IEnumerator GetWord(string word)
+    private IEnumerator GetWord(string word, WVObject<WordAndEmoIdeal> result)
     {
-        WVObject<WordAndEmoIdeal> result = new WVObject<WordAndEmoIdeal>(word);
+
+        Debug.Log("Getting word " + word + " from db");
+        //WVObject<WordAndEmoIdeal> result = new WVObject<WordAndEmoIdeal>(word);
 
         WVObjectList_WordAndEmoIdeal.Add(result);
 
         WordAndEmoIdeal wordEmoIdeal = new WordAndEmoIdeal();
 
-        MySqlCommand command = _connection.CreateCommand();
-        command.CommandText = "SELECT " + TABLE_WORD + ", " + TABLE_EMO_IDEAL + " FROM " + TABLE_NAME +
+        using (MySqlCommand command = _connection.CreateCommand())
+        {
+            command.CommandText = "SELECT " + TABLE_WORD + ", " + TABLE_EMO_IDEAL + " FROM " + TABLE_NAME +
             " WHERE " + TABLE_WORD + " = " + "'" + word + "'";
 
-         System.IAsyncResult asyncResult = command.BeginExecuteReader();
+            System.IAsyncResult asyncResult = command.BeginExecuteReader(System.Data.CommandBehavior.CloseConnection);
 
-         while (!asyncResult.IsCompleted) { yield return null; }
+            Debug.Log("Connection before command: " + Connection.State.ToString());
 
-         MySqlDataReader data = command.EndExecuteReader(asyncResult);
+            while (!asyncResult.IsCompleted) { yield return null; }
+            try
+            {
+                MySqlDataReader data;
+                using (data = command.EndExecuteReader(asyncResult))
+                {
+                    Debug.LogWarning("before data.Read()");
+                    while (data.Read())
+                    {
+                        string w = (string)data[TABLE_WORD];
+                        EmotionModel.EmotionIdeal emoIdeal = (EmotionModel.EmotionIdeal)
+                            System.Enum.Parse(typeof(EmotionModel.EmotionIdeal),
+                            data[TABLE_EMO_IDEAL].ToString());
 
-        while (data.Read())
-        {
-            string w = (string)data[TABLE_WORD];
-            EmotionModel.EmotionIdeal emoIdeal = (EmotionModel.EmotionIdeal)
-                System.Enum.Parse(typeof(EmotionModel.EmotionIdeal), 
-                (string)data[TABLE_EMO_IDEAL]);
+                        wordEmoIdeal.word = w;
+                        wordEmoIdeal.emoEnum = emoIdeal;
 
-            wordEmoIdeal.word = w;
-            wordEmoIdeal.emoEnum = emoIdeal;
+                        result.value = wordEmoIdeal;//at this point, since it's not null, we set it!
+                        Debug.LogWarning("reading data");
+                    }
+                    Debug.LogWarning("Data.isClosed = " + data.IsClosed.ToString());
+                    //if (!data.IsClosed) data.Close();
+                }
+                Debug.LogWarning("Data.isClosed AFTER using: " + data.IsClosed.ToString());
 
-            result.value = wordEmoIdeal;//at this point, since it's not null, we set it!
+                Debug.Log("Connection after everything: " + Connection.State.ToString());
+            }
+            catch (System.InvalidOperationException e)
+            {
+                Debug.LogError(e.StackTrace);
+                Debug.LogError(e.Message);
+            }
+
         }
     }
 

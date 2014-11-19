@@ -90,6 +90,7 @@ public class SynonymFinder : MonoBehaviour
     {
         //Word result = new Word();
         result.isDone = false;
+        result.WordString = word;
         string requestStr = GetRequestString(word);
 
         WWW returnedQuery = GET(requestStr);
@@ -112,7 +113,15 @@ public class SynonymFinder : MonoBehaviour
 #endif
         }//do nothing while it's processing
 
-        string jsonString = returnedQuery.text; //for now we only support JSON
+        if (returnedQuery.error != null) {
+            if (returnedQuery.error.ToLower().Contains("404 not found"))
+            {
+                result.AddWord("NoData");
+                result.WordString = "NoData";
+            }
+        }
+        else {
+                  string jsonString = returnedQuery.text; //for now we only support JSON
 
         var N = JSON.Parse(jsonString);
 
@@ -138,6 +147,8 @@ public class SynonymFinder : MonoBehaviour
                 }
             }
         }
+        }
+  
 
         result.isDone = true;
         //return result;
