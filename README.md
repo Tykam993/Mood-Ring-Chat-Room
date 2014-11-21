@@ -14,13 +14,11 @@ Why
 I like the idea of the environment changing based on unconscious decisions. When we speak, we often don't realize
 what kind of language or tone we're using--especially in online chat. I thought it would be fun to objectively (and not-so-objectively) analyze what people are saying, and reflect that visually.
 
-Inner-workings
-===
+-Inner-workings-
 The app is set up with the Model-View-Control pattern (http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller).
 The chat system represents the view, the user-input as way of interfacing with the Control, and the Model as the "emotional state" of the user.
 
-as of 11/20/2014:
-=
+-as of 11/20/2014-
 - When a user inputs something into chat, the controller grabs the input, splits it into a list of single words, and removes duplicates.
 - It then checks the MySQL database to see if each word has any related value to it. If not, it then interacts with Big Huge Thesaurus to get a list of synonyms of the input word.
 - If any of the synonyms match our criteria for having an "emotional value," we add the input word associated with its "emotional value" to the MySQL database (this saves us costly GET requests to Big Huge Thesaurus' API--we get 1000/day).
