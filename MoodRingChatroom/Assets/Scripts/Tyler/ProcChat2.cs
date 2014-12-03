@@ -21,9 +21,9 @@ public class ProcChat2 : MonoBehaviour
 	private void OnGUI ()
 	{
 
-		//	if (!Network.isClient) {
-		//			return;
-		//	}
+			if (!Network.isClient) {
+					return;
+			}
 
 		GUILayout.Space (20);
 

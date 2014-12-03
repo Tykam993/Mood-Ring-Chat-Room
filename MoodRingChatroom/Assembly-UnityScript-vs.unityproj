@@ -39,17 +39,17 @@
 	<Reference Include="System.Core" />
 	<Reference Include="System.Xml.Linq" />
 	<Reference Include="UnityEngine">
-	  <HintPath>/Volumes/UNTITLED/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
+	  <HintPath>/Applications/Unity/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEngine.dll</HintPath>
 	</Reference>
 	<Reference Include="UnityEditor">
-	  <HintPath>/Volumes/UNTITLED/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
+	  <HintPath>/Applications/Unity/Applications/Unity/Unity.app/Contents/Frameworks/Managed/UnityEditor.dll</HintPath>
 	</Reference>
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\JSON Tests\UnityScript\Test_UnityScript.js" />
      <None Include="Assets\JSON Tests\TroubleShoot.txt" />
  <Reference Include="UnityEngine.UI">
- <HintPath>/Volumes/UNTITLED/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
+ <HintPath>/Applications/Unity/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
  </Reference>
  <Reference Include="MySql.Data">
  <HintPath>/Users/Tykam993/Northeastern/Game AI/ProcJam/procjam-three-musketeers/MoodRingChatroom/Assets/plugins/MySQL/MySql.Data.dll</HintPath>
