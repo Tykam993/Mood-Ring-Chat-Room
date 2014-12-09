@@ -20,6 +20,7 @@ public class ProcChat2 : MonoBehaviour
 
 	private void OnGUI ()
 	{
+		GUI.color = Color.white;
 
 			if (!Network.isClient) {
 					return;
@@ -29,12 +30,19 @@ public class ProcChat2 : MonoBehaviour
 
 		GUILayout.BeginHorizontal (GUILayout.Width (GUIWidth));
 
-		currentMessage = GUILayout.TextField (currentMessage);
+		currentMessage = GUILayout.TextField (currentMessage, GUILayout.Width(Screen.width/3), 
+		                                      GUILayout.Height(Screen.height/15));
+		GUILayout.EndHorizontal ();
 
-		if (GUILayout.Button ("Send") || (Event.current.keyCode == KeyCode.Return)) {
+
+		//GUILayout.Space (20);
+		GUILayout.BeginHorizontal (GUILayout.Width (GUIWidth));
+		GUI.color = Color.white;
+		if (GUILayout.Button ("   Send   ", GUILayout.Width(Screen.width/3), 
+		                      GUILayout.Height(Screen.height/15)) || (Event.current.keyCode == KeyCode.Return)) {
 
 			if (!string.IsNullOrEmpty (currentMessage.Trim ())) {
-				networkView.RPC ("ChatMessage", RPCMode.AllBuffered, new object[] {userName + ":\t" + currentMessage });
+				networkView.RPC ("ChatMessage", RPCMode.AllBuffered, new object[] {userName + ":  " + currentMessage });
 
 				//in here process the current message sent!
 				ProcessChatMessage.ProcessChat (currentMessage);
@@ -47,13 +55,19 @@ public class ProcChat2 : MonoBehaviour
 
 		GUILayout.EndHorizontal ();
 
-		GUILayout.Space (20);
+		//GUILayout.Space (20);
 			
 		GUILayout.BeginHorizontal (GUILayout.Width (GUIWidth));
 
-		userName = GUILayout.TextField (userName);
+		userName = GUILayout.TextField (userName, GUILayout.Width(Screen.width/3), 
+		                                GUILayout.Height(Screen.height/15));
 
-		if (GUILayout.Button ("Change")) {
+		GUILayout.EndHorizontal ();
+
+		GUILayout.BeginHorizontal (GUILayout.Width (GUIWidth));
+		GUI.color = Color.white;
+		if (GUILayout.Button ("Change", GUILayout.Width(Screen.width/3), 
+		                      GUILayout.Height(Screen.height/15))) {
 			if (!string.IsNullOrEmpty (userName.Trim ())) {
 				userName = userName;
 			}
@@ -62,7 +76,7 @@ public class ProcChat2 : MonoBehaviour
 		GUILayout.EndHorizontal ();
 
 		scrollPosition = GUILayout.BeginScrollView (scrollPosition, true, false, 
-			                                            GUILayout.Width (GUIWidth), 
+		                                            GUILayout.Width (Screen.width/3),
 			                                            GUILayout.Height (Screen.height / 2));
 		for (int i = chatHistory.Count - 1; i >= 0; i--)
 			GUILayout.Label (chatHistory [i]);

@@ -4,14 +4,19 @@
 using UnityEngine;
 using System.Collections;
 
+
 public class NetworkManager : MonoBehaviour {
 
+	int GUIWidth = 350, GUIHeight = 500;
+	public GameObject startServerButton;
 	string registeredGameName = "ProcJam_MoodRing_Chat_Server";
 	bool isRefreshing = false;
 	float refreshRequestLength = 3.0f;
 	HostData[] hostData;
 
-	private void StartServer() {
+
+
+	public void StartServer() {
 
 		Network.InitializeServer (16, 25002, false);
 		MasterServer.RegisterHost (registeredGameName, "ProcJam MoodRing Chat", "Chat with mood detection");
@@ -60,23 +65,31 @@ public class NetworkManager : MonoBehaviour {
 			return;
 		}
 
-
-		if (GUI.Button(new Rect(25f,25f,150f,30f), "Start New Server")) {
+		GUILayout.BeginHorizontal (GUILayout.Width (GUIWidth));
+		if (GUILayout.Button("Start New Server",GUILayout.Width(Screen.width/3), 
+		               GUILayout.Height(Screen.height/3))) {
 
 			//Start server function
 			StartServer();
 
-		}
 
-		if(GUI.Button(new Rect(25f,65f,150f,30f), "Refresh Server List")) {
+		}
+		GUILayout.EndHorizontal ();
+
+		GUILayout.Space (20);
+
+		GUILayout.BeginHorizontal (GUILayout.Width (GUIWidth));
+		if(GUILayout.Button("Refresh Server List",GUILayout.Width(Screen.width/3), 
+		              GUILayout.Height(Screen.height/3))) {
 			//refresh server list
 			StartCoroutine("RefreshHostList");
 		}
-
+		GUILayout.EndHorizontal ();
 		if (hostData != null) {
 
 			for(int i = 0; i < hostData.Length ; i++) {
-				if(GUI.Button(new Rect(Screen.width/2, 65f + (30f * i), 300f, 30f), hostData[i].gameName)) {
+				if(GUI.Button(new Rect(Screen.width/2, 65f + (30f * i), Screen.width/2, 
+				                       Screen.height/10), hostData[i].gameName)) {
 
 					Network.Connect(hostData[i]);
 				}
