@@ -25,7 +25,7 @@ public class NoiseGenerator : MonoBehaviour {
 
 	public float amp = 1.0f;
 	public float frq = 50.0f;
-	public int oct = 50;
+	public int oct = 8;
 
 	void Start() {
 		// Set the width and height to the plane's dimensions
@@ -39,6 +39,8 @@ public class NoiseGenerator : MonoBehaviour {
 		gameObject.renderer.material.mainTexture = noiseTex;
 
 		perlin = new PerlinNoise(0);
+		print (planeHeight);
+		print (planeWidth);
 	}
 
 	void Update() {
@@ -60,7 +62,7 @@ public class NoiseGenerator : MonoBehaviour {
 			change*=-1f;;
 		}
 //		amp++;
-		frq-=0.05f;
+		frq+=0.05f;
 	}
 
 	void GeneratePerlin() {
@@ -91,12 +93,12 @@ public class NoiseGenerator : MonoBehaviour {
 		float b = 1.0f-EmotionModel.CurrentState.x/1.0f;
 
 		
-		for(float x = 0.0F; x < noiseTex.width; x++) {
-			for(float y = 0.0F; y < noiseTex.height; y++) {
-				float noise = perlin.FractalNoise2D(x,y,oct,frq,1.0f);
-				noise = (noise + 1.0f) * 0.5f;
+		for(float x = 0.0F; x < 512; x++) {
+			for(float y = 0.0F; y < 512; y++) {
+				float noise = perlin.FractalNoise2D(x,y,oct,frq,amp);
+				noise = (noise + 1.0f) * 0.25f;
 //				noiseTex.SetPixel((int)x,(int)y,new Color(noise*r,noise*g,noise*b));
-				noiseTex.SetPixel((int)x,(int)y,new Color(noise, noise, noise, 1.0f));
+				noiseTex.SetPixel((int)x,(int)y,new Color(noise*r, noise*g, noise*b, 1.0f));
 			}
 		}
 		noiseTex.Apply();

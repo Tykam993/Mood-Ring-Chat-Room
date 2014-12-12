@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class PerlinNoise
+public class PerlinNoise : MonoBehaviour
 {
 	const int B = 256;
 	int[] m_perm = new int[B+B];
@@ -198,7 +198,7 @@ public class PerlinNoise
 		for(int i = 0; i < octNum; i++)
 		{
 			sum +=  Noise1D(x*gain/frq) * amp/gain;
-			gain *= 2.0f;
+//			gain *= 2.0f;
 		}
 		return sum;
 	}
@@ -207,11 +207,11 @@ public class PerlinNoise
 	{
 		float gain = 1.0f;
 		float sum = 0.0f;
-	
+
 		for(int i = 0; i < octNum; i++)
 		{
 			sum += Noise2D(x*gain/frq, y*gain/frq) * amp/gain;
-			gain *= 2.0f;
+//			gain *= 2.0f;
 		}
 		return sum;
 	}
@@ -224,7 +224,7 @@ public class PerlinNoise
 		for(int i = 0; i < octNum; i++)
 		{
 			sum +=  Noise3D(x*gain/frq, y*gain/frq, z*gain/frq) * amp/gain;
-			gain *= 2.0f;
+//			gain *= 2.0f;
 		}
 		return sum;
 	}
