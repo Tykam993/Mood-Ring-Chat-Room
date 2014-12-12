@@ -69,7 +69,7 @@ public class ProcChat2 : MonoBehaviour
 		if (GUILayout.Button ("Change", GUILayout.Width(Screen.width/3), 
 		                      GUILayout.Height(Screen.height/15))) {
 			if (!string.IsNullOrEmpty (userName.Trim ())) {
-				userName = userName;
+			
 			}
 		}
 
