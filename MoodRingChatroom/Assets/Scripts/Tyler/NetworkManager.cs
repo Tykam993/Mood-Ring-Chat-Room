@@ -59,6 +59,7 @@ public class NetworkManager : MonoBehaviour {
 	}
 
 	public void OnGUI() {
+		GUILayout.BeginVertical (GUILayout.Width (Screen.width/2));
 
 		if (Network.isClient || Network.isServer) {
 
@@ -76,7 +77,7 @@ public class NetworkManager : MonoBehaviour {
 		}
 		GUILayout.EndHorizontal ();
 
-		GUILayout.Space (20);
+		GUILayout.Space (Screen.height/4);
 
 		GUILayout.BeginHorizontal (GUILayout.Width (GUIWidth));
 		if(GUILayout.Button("Refresh Server List",GUILayout.Width(Screen.width/3), 
@@ -95,5 +96,6 @@ public class NetworkManager : MonoBehaviour {
 				}
 			}
 		}
+		GUILayout.EndVertical ();
 	}
 }

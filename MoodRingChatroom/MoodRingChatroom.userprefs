@@ -1,9 +1,9 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Tyler/NetMan.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/Tyler/ProcChat2.cs">
     <Files>
-      <File FileName="Assets/Scripts/Tyler/NetworkManager.cs" Line="11" Column="38" />
-      <File FileName="Assets/Scripts/Tyler/NetMan.cs" Line="119" Column="6" />
+      <File FileName="Assets/Scripts/Tyler/NetworkManager.cs" Line="100" Column="1" />
+      <File FileName="Assets/Scripts/Tyler/ProcChat2.cs" Line="27" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
