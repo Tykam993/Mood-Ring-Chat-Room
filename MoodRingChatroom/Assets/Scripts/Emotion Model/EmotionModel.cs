@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// This is the core model of how we represent the emotional state of the user.
@@ -56,6 +57,8 @@ public class EmotionModel
     private float _weight = .5f; //between 0 and 1; 0 means there's no effect; 1 meanas it has a total effect (full interpolation from vectorA to vectorB)
     private static EmotionModel _instance;
     private int _modCount = 0; //the number of times we've modified the model
+    private Queue<Vector2> _modificationQueue = new Queue<Vector2>(); //Whenever we change the model and LERP it, we must then use a queue since changes occur over time
+    bool _modQueueBusy = false;
     #endregion
 
     #region Private Properties
@@ -129,13 +132,21 @@ public class EmotionModel
     /// </summary>
     /// <param name="emotionIdeals">The emotion ideals that we are "aiming" for</param>
     /// <param name="idealOffset">How far from the unit circle the ideals lie; 0.5 by default</param>
-    public static void ChangeStateByAddingEmotions(EmotionIdeal[] emotionIdeals, float idealOffset = .5f)
+    public static void ChangeStateByAddingEmotions(EmotionIdeal[] emotionIdeals, float idealOffset = .5f, bool lerp=true)
     {
         //Get the emo vector associated with the Emotion Ideals
         Vector2 emoIdealVector = Instance.GetEmoVector(emotionIdeals, idealOffset);
 
-        //Move the current state vector
-        Instance.MoveCurrentState(emoIdealVector);
+        if (lerp)
+        {
+            Instance._modificationQueue.Enqueue(emoIdealVector);
+            Instance.LerpCurrentState();
+        }
+        else
+        {
+            //Move the current state vector
+            Instance.MoveCurrentState(emoIdealVector);
+        }
 
         //Update the number of times we've modified the model
         Instance._modCount++;
@@ -145,10 +156,19 @@ public class EmotionModel
     }
 
 
-    public static void ChangeStateByAddingVector(Vector2 vec, float idealOffset = .5f)
+    public static void ChangeStateByAddingVector(Vector2 vec, float idealOffset = .5f, bool lerp = true)
     {
-        //Move the current state vector
-        Instance.MoveCurrentState(vec);
+        if (lerp)
+        {
+            Instance._modificationQueue.Enqueue(vec);
+            Instance.LerpCurrentState();
+        }
+        else
+        {
+            //Move the current state vector
+            Instance.MoveCurrentState(vec);
+        }
+
 
         //Update the number of times we've modified the model
         Instance._modCount++;
@@ -182,6 +202,49 @@ public class EmotionModel
     private void MoveCurrentState(Vector2 idealMoveTo)
     {
         _currentState = Vector2.Lerp(_currentState, idealMoveTo, Weight);
+    }
+
+
+    /// <summary>
+    /// Instead of instantly changing the current model, it attempts to lerp it.
+    /// This is by looking at _modificationQueue, and as long as there's no current lerp
+    /// going on, it'll lerp to _modificationQueue.Dequeue()
+    /// </summary>
+    private void LerpCurrentState()
+    {
+        //if there's nothing to lerp, return
+        if (_modificationQueue.Count == 0)
+        {
+            return;
+        }
+
+        if (!_modQueueBusy)
+        {
+            CoroutineObject.Instance.StartCoroutine(LerpCurrentStateCoroutine(_modificationQueue.Dequeue()));
+        }
+    }
+
+    private IEnumerator LerpCurrentStateCoroutine(Vector2 idealMoveTo)
+    {
+        Debug.Log("started lerp");
+        _modQueueBusy = true;
+
+        Vector2 start = _currentState;
+        Vector2 end = Vector2.Lerp(_currentState, idealMoveTo, Weight);
+
+        float t = 0;
+        while (t < 1f)
+        {
+            Vector2 newVec = Vector2.Lerp(start, end, t);
+            _currentState = newVec;
+            yield return new WaitForFixedUpdate();
+            t += (1 / 40f);
+        }
+        _currentState = end;
+
+        _modQueueBusy = false;
+
+        LerpCurrentState();
     }
 
     private Vector2 GetEmoVector(EmotionIdeal[] emotionIdeals, float idealOffset = .5f)
